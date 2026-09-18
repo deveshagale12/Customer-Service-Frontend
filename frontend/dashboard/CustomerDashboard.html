@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7f6;
+            color: #17212b;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: #062d2b;
+            color: white;
+            padding: 24px 16px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            padding: 8px 12px 30px;
+        }
+
+        .brand span {
+            color: #d4af37;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav a {
+            padding: 13px 15px;
+            border-radius: 10px;
+            color: #d7e5e3;
+            transition: .2s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #0d514c;
+            color: white;
+        }
+
+        .logout {
+            margin-top: 30px;
+            width: 100%;
+            border: 1px solid #52716d;
+            background: transparent;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .logout:hover {
+            background: #b42318;
+            border-color: #b42318;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e1e7e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar h1 {
+            font-size: 25px;
+        }
+
+        .topbar p {
+            color: #71807c;
+            margin-top: 5px;
+        }
+
+        .user-badge {
+            background: #e8f5f2;
+            color: #075e54;
+            padding: 10px 15px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 30px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        /* WELCOME */
+        .welcome {
+            background: linear-gradient(135deg, #063c38, #0c6b62);
+            color: white;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #d5ebe7;
+        }
+
+        /* CARDS */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid #e3e9e7;
+            box-shadow: 0 5px 18px rgba(0,0,0,.04);
+        }
+
+        .card-label {
+            color: #71807c;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 21px;
+            font-weight: 750;
+            color: #063c38;
+            word-break: break-word;
+        }
+
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #e3e9e7;
+            margin-bottom: 25px;
+        }
+
+        .section h3 {
+            color: #063c38;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .info {
+            background: #f6f9f8;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .info small {
+            color: #788682;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .info strong {
+            color: #17312e;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .action {
+            border: 1px solid #dce6e3;
+            border-radius: 13px;
+            padding: 20px;
+            transition: .2s;
+        }
+
+        .action:hover {
+            border-color: #0b756b;
+            transform: translateY(-2px);
+        }
+
+        .action h4 {
+            color: #063c38;
+            margin-bottom: 7px;
+        }
+
+        .action p {
+            color: #71807c;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            background: #e8f5f2;
+            color: #087267;
+        }
+
+        .error {
+            color: #b42318;
+            background: #fff0ee;
+            padding: 14px;
+            border-radius: 10px;
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        /* MOBILE */
+        @media(max-width: 1000px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 700px) {
+            .sidebar {
+                position: fixed;
+                width: 100%;
+                height: auto;
+                bottom: 0;
+                top: auto;
+                padding: 7px;
+            }
+
+            .brand,
+            .logout {
+                display: none;
+            }
+
+            .nav {
+                flex-direction: row;
+                justify-content: space-around;
+                gap: 2px;
+            }
+
+            .nav a {
+                font-size: 11px;
+                padding: 10px 5px;
+                text-align: center;
+                flex: 1;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding-bottom: 70px;
+            }
+
+            .topbar {
+                padding: 18px;
+            }
+
+            .topbar h1 {
+                font-size: 20px;
+            }
+
+            .user-badge {
+                display: none;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .welcome {
+                padding: 23px;
+            }
+
+            .welcome h2 {
+                font-size: 23px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">
+            Fin<span>ova</span>
+        </div>
+
+        <nav class="nav">
+            <a class="active" href="CustomerDashboard.html">⌂ Dashboard</a>
+            <a href="CustomerProfile.html">♙ Profile</a>
+            <a href="CustomerContacts.html">☎ Contacts</a>
+            <a href="CustomerAddresses.html">⌖ Addresses</a>
+        </nav>
+
+        <button class="logout" onclick="logout()">Logout</button>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <h1>Customer Dashboard</h1>
+                <p>Your customer overview</p>
+            </div>
+
+            <div class="user-badge" id="topCustomerName">
+                Loading...
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div id="errorBox" class="error"></div>
+
+            <section class="welcome">
+                <h2 id="welcomeName">Welcome</h2>
+                <p>
+                    Manage your customer profile, contacts and addresses from one place.
+                </p>
+            </section>
+
+            <section class="grid">
+
+                <div class="card">
+                    <div class="card-label">Customer Number</div>
+                    <div class="card-value" id="customerNumber">-</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-label">Customer Type</div>
+                    <div class="card-value" id="customerType">-</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-label">Customer Status</div>
+                    <div class="card-value">
+                        <span class="status" id="customerStatus">-</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-label">Customer ID</div>
+                    <div class="card-value" id="customerId">-</div>
+                </div>
+
+            </section>
+
+            <section class="section">
+
+                <h3>Customer Information</h3>
+
+                <div class="info-grid">
+
+                    <div class="info">
+                        <small>Full Name</small>
+                        <strong id="fullName">-</strong>
+                    </div>
+
+                    <div class="info">
+                        <small>Email</small>
+                        <strong id="email">-</strong>
+                    </div>
+
+                    <div class="info">
+                        <small>Mobile Number</small>
+                        <strong id="mobile">-</strong>
+                    </div>
+
+                    <div class="info">
+                        <small>Date of Birth</small>
+                        <strong id="dob">-</strong>
+                    </div>
+
+                    <div class="info">
+                        <small>Gender</small>
+                        <strong id="gender">-</strong>
+                    </div>
+
+                    <div class="info">
+                        <small>Created At</small>
+                        <strong id="createdAt">-</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="section">
+
+                <h3>Manage Your Account</h3>
+
+                <div class="actions">
+
+                    <a class="action" href="CustomerProfile.html">
+                        <h4>Customer Profile</h4>
+                        <p>View and update your personal information.</p>
+                    </a>
+
+                    <a class="action" href="CustomerContacts.html">
+                        <h4>Contacts</h4>
+                        <p>Manage your customer contact information.</p>
+                    </a>
+
+                    <a class="action" href="CustomerAddresses.html">
+                        <h4>Addresses</h4>
+                        <p>Manage addresses and your primary address.</p>
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+</div>
+
+<script>
+const BASE_URL = "https://customerservice-mmah.onrender.com";
+const API_BASE = BASE_URL + "/api/v1/customers";
+const API_KEY = "my-secret-api-key-12345";
+
+const token = localStorage.getItem("customerToken");
+const authenticated =
+    localStorage.getItem("isAuthenticated") === "true";
+
+if (!token || !authenticated) {
+    location.replace("../customerLoginReg.html");
+}
+
+function requestHeaders(body = false) {
+
+    const token = localStorage.getItem("customerToken");
+
+    const headers = {
+        "Authorization": "Bearer " + token,
+        "X-API-KEY": API_KEY
+    };
+
+    if (body) {
+        headers["Content-Type"] = "application/json";
+    }
+
+    return headers;
+}
+
+async function api(path, options = {}) {
+
+    const response = await fetch(API_BASE + path, {
+        ...options,
+        headers: {
+            ...requestHeaders(options.body !== undefined),
+            ...(options.headers || {})
+        }
+    });
+
+    const text = await response.text();
+
+    let data = null;
+
+    try {
+        data = text ? JSON.parse(text) : null;
+    } catch {
+        data = text;
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            data?.message ||
+            data?.error ||
+            `Request failed (${response.status})`
+        );
+    }
+
+    return data;
+}
+
+function getCustomerFromStorage() {
+    try {
+        return JSON.parse(
+            localStorage.getItem("customer") || "null"
+        );
+    } catch {
+        return null;
+    }
+}
+
+function getCustomerId() {
+    const customer = getCustomerFromStorage();
+    return customer?.customerId;
+}
+
+function fullName(customer) {
+
+    return [
+        customer?.firstName,
+        customer?.middleName,
+        customer?.lastName
+    ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function formatDate(value) {
+
+    if (!value) return "-";
+
+    try {
+        return new Date(value).toLocaleDateString("en-IN");
+    } catch {
+        return value;
+    }
+}
+
+async function loadDashboard() {
+
+    try {
+
+        const id = getCustomerId();
+
+        if (!id) {
+            throw new Error("Customer ID not found. Please login again.");
+        }
+
+        const customer = await api("/" + id);
+
+        localStorage.setItem(
+            "customer",
+            JSON.stringify(customer)
+        );
+
+        document.getElementById("welcomeName").textContent =
+            "Welcome, " + (customer.firstName || "Customer");
+
+        document.getElementById("topCustomerName").textContent =
+            fullName(customer) || "Customer";
+
+        document.getElementById("customerNumber").textContent =
+            customer.customerNumber || "-";
+
+        document.getElementById("customerType").textContent =
+            customer.customerType || "-";
+
+        document.getElementById("customerStatus").textContent =
+            customer.status || "-";
+
+        document.getElementById("customerId").textContent =
+            customer.customerId || "-";
+
+        document.getElementById("fullName").textContent =
+            fullName(customer) || "-";
+
+        document.getElementById("email").textContent =
+            customer.email || "-";
+
+        document.getElementById("mobile").textContent =
+            customer.mobileNumber || "-";
+
+        document.getElementById("dob").textContent =
+            formatDate(customer.dateOfBirth);
+
+        document.getElementById("gender").textContent =
+            customer.gender || "-";
+
+        document.getElementById("createdAt").textContent =
+            formatDate(customer.createdAt);
+
+    } catch (error) {
+
+        console.error(error);
+
+        const box = document.getElementById("errorBox");
+
+        box.textContent = error.message;
+        box.style.display = "block";
+    }
+}
+
+function logout() {
+
+    localStorage.removeItem("customerToken");
+    localStorage.removeItem("customer");
+    localStorage.removeItem("isAuthenticated");
+
+    location.replace("../customerLoginReg.html");
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

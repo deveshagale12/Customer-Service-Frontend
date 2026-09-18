@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Customer Addresses</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7f6;
+            color: #17212b;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background: #062d2b;
+            color: white;
+            padding: 24px 16px;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            padding: 8px 12px 30px;
+        }
+
+        .brand span {
+            color: #d4af37;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav a {
+            padding: 13px 15px;
+            border-radius: 10px;
+            color: #d7e5e3;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #0d514c;
+            color: white;
+        }
+
+        .logout {
+            margin-top: 30px;
+            width: 100%;
+            border: 1px solid #52716d;
+            background: transparent;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e1e7e5;
+        }
+
+        .topbar h1 {
+            font-size: 25px;
+        }
+
+        .topbar p {
+            color: #71807c;
+            margin-top: 5px;
+        }
+
+        .content {
+            max-width: 1150px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e9e7;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 22px;
+        }
+
+        .card h2 {
+            color: #063c38;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .field label {
+            display: block;
+            color: #667772;
+            font-size: 13px;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d5dfdc;
+            border-radius: 9px;
+            outline: none;
+            background: white;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #087267;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            border: none;
+            border-radius: 9px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .primary {
+            background: #087267;
+            color: white;
+        }
+
+        .secondary {
+            background: #e8f1ef;
+            color: #075e54;
+        }
+
+        .danger {
+            background: #fff0ee;
+            color: #b42318;
+        }
+
+        .gold {
+            background: #fff7df;
+            color: #856404;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .address-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .address {
+            border: 1px solid #dfe7e4;
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .address.primary-address {
+            border: 2px solid #d4af37;
+        }
+
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .address-type {
+            color: #063c38;
+            font-weight: 700;
+        }
+
+        .primary-badge {
+            background: #fff7df;
+            color: #856404;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .address-text {
+            line-height: 1.7;
+            color: #44534f;
+        }
+
+        .address-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 17px;
+        }
+
+        .message {
+            padding: 13px;
+            border-radius: 9px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .success-message {
+            background: #e9f8ef;
+            color: #146c36;
+        }
+
+        .error-message {
+            background: #fff0ee;
+            color: #b42318;
+        }
+
+        @media(max-width: 800px) {
+
+            .address-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 700px) {
+
+            .sidebar {
+                top: auto;
+                width: 100%;
+                height: auto;
+                bottom: 0;
+                padding: 7px;
+                z-index: 100;
+            }
+
+            .brand,
+            .logout {
+                display: none;
+            }
+
+            .nav {
+                flex-direction: row;
+                gap: 2px;
+            }
+
+            .nav a {
+                flex: 1;
+                text-align: center;
+                font-size: 11px;
+                padding: 10px 4px;
+            }
+
+            .main {
+                margin-left: 0;
+                padding-bottom: 70px;
+            }
+
+            .topbar {
+                padding: 18px;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="brand">
+        Fin<span>ova</span>
+    </div>
+
+    <nav class="nav">
+
+        <a href="CustomerDashboard.html">
+            ⌂ Dashboard
+        </a>
+
+        <a href="CustomerProfile.html">
+            ♙ Profile
+        </a>
+
+        <a href="CustomerContacts.html">
+            ☎ Contacts
+        </a>
+
+        <a
+            class="active"
+            href="CustomerAddresses.html"
+        >
+            ⌖ Addresses
+        </a>
+
+    </nav>
+
+    <button
+        class="logout"
+        onclick="logout()"
+    >
+        Logout
+    </button>
+
+</aside>
+
+<main class="main">
+
+    <header class="topbar">
+
+        <h1>
+            Customer Addresses
+        </h1>
+
+        <p>
+            Manage your addresses
+        </p>
+
+    </header>
+
+    <div class="content">
+
+        <div
+            id="successMessage"
+            class="message success-message"
+        ></div>
+
+        <div
+            id="errorMessage"
+            class="message error-message"
+        ></div>
+
+        <section class="card">
+
+            <h2 id="formTitle">
+                Add Address
+            </h2>
+
+            <input
+                type="hidden"
+                id="addressId"
+            >
+
+            <div class="form-grid">
+
+                <div class="field">
+
+                    <label>
+                        Address Type
+                    </label>
+
+                    <select id="addressType">
+
+                        <option value="">
+                            Select Address Type
+                        </option>
+
+                        <option value="HOME">
+                            Home
+                        </option>
+
+                        <option value="OFFICE">
+                            Office
+                        </option>
+
+                        <option value="PERMANENT">
+                            Permanent
+                        </option>
+
+                        <option value="CURRENT">
+                            Current
+                        </option>
+
+                        <option value="OTHER">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Country
+                    </label>
+
+                    <input
+                        id="country"
+                        value="India"
+                    >
+
+                </div>
+
+                <div class="field full">
+
+                    <label>
+                        Address Line 1
+                    </label>
+
+                    <input
+                        id="addressLine1"
+                        placeholder="House / Flat / Building"
+                    >
+
+                </div>
+
+                <div class="field full">
+
+                    <label>
+                        Address Line 2
+                    </label>
+
+                    <input
+                        id="addressLine2"
+                        placeholder="Street / Area / Landmark"
+                    >
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        City
+                    </label>
+
+                    <input
+                        id="city"
+                        placeholder="City"
+                    >
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        State
+                    </label>
+
+                    <input
+                        id="state"
+                        placeholder="State"
+                    >
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Postal Code
+                    </label>
+
+                    <input
+                        id="postalCode"
+                        placeholder="Postal code"
+                    >
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Primary Address
+                    </label>
+
+                    <select id="isPrimary">
+
+                        <option value="false">
+                            No
+                        </option>
+
+                        <option value="true">
+                            Yes
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    class="primary"
+                    onclick="saveAddress()"
+                >
+                    Save Address
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="resetForm()"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="card">
+
+            <h2>
+                Your Addresses
+            </h2>
+
+            <div
+                id="addressList"
+                class="address-list"
+            >
+                Loading addresses...
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<script>
+
+const BASE_URL =
+    "https://customerservice-mmah.onrender.com";
+
+const API_BASE =
+    BASE_URL + "/api/v1/customers";
+
+const API_KEY =
+    "my-secret-api-key-12345";
+
+const token =
+    localStorage.getItem("customerToken");
+
+const authenticated =
+    localStorage.getItem(
+        "isAuthenticated"
+    ) === "true";
+
+if (!token || !authenticated) {
+
+    location.replace(
+        "../customerLoginReg.html"
+    );
+}
+
+function requestHeaders(body = false) {
+
+    const headers = {
+
+        "Authorization":
+            "Bearer " +
+            localStorage.getItem(
+                "customerToken"
+            ),
+
+        "X-API-KEY":
+            API_KEY
+    };
+
+    if (body) {
+
+        headers["Content-Type"] =
+            "application/json";
+    }
+
+    return headers;
+}
+
+async function api(path, options = {}) {
+
+    const response =
+        await fetch(
+            API_BASE + path,
+            {
+                ...options,
+
+                headers: {
+
+                    ...requestHeaders(
+                        options.body !== undefined
+                    ),
+
+                    ...(options.headers || {})
+                }
+            }
+        );
+
+    const text =
+        await response.text();
+
+    let data;
+
+    try {
+
+        data =
+            text
+                ? JSON.parse(text)
+                : null;
+
+    } catch {
+
+        data = text;
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+
+            data?.message ||
+            data?.error ||
+            `Request failed (${response.status})`
+        );
+    }
+
+    return data;
+}
+
+function getCustomerId() {
+
+    try {
+
+        const customer =
+            JSON.parse(
+                localStorage.getItem(
+                    "customer"
+                ) || "null"
+            );
+
+        return customer?.customerId;
+
+    } catch {
+
+        return null;
+    }
+}
+
+function showSuccess(message) {
+
+    const el =
+        document.getElementById(
+            "successMessage"
+        );
+
+    el.textContent = message;
+    el.style.display = "block";
+
+    document.getElementById(
+        "errorMessage"
+    ).style.display = "none";
+}
+
+function showError(message) {
+
+    const el =
+        document.getElementById(
+            "errorMessage"
+        );
+
+    el.textContent = message;
+    el.style.display = "block";
+
+    document.getElementById(
+        "successMessage"
+    ).style.display = "none";
+}
+
+async function loadAddresses() {
+
+    try {
+
+        const customerId =
+            getCustomerId();
+
+        if (!customerId) {
+
+            throw new Error(
+                "Customer ID not found."
+            );
+        }
+
+        const addresses =
+            await api(
+                "/" +
+                customerId +
+                "/addresses"
+            );
+
+        renderAddresses(
+            Array.isArray(addresses)
+                ? addresses
+                : []
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(error.message);
+
+        document.getElementById(
+            "addressList"
+        ).innerHTML =
+            "<p>Unable to load addresses.</p>";
+    }
+}
+
+function renderAddresses(addresses) {
+
+    const list =
+        document.getElementById(
+            "addressList"
+        );
+
+    if (!addresses.length) {
+
+        list.innerHTML =
+            "<p>No addresses found.</p>";
+
+        return;
+    }
+
+    list.innerHTML =
+        addresses.map(address => `
+
+            <div
+                class="address
+                ${
+                    address.primary ||
+                    address.isPrimary
+                        ? "primary-address"
+                        : ""
+                }"
+            >
+
+                <div class="address-header">
+
+                    <div class="address-type">
+
+                        ${escapeHtml(
+                            address.addressType || "-"
+                        )}
+
+                    </div>
+
+                    ${
+                        address.primary ||
+                        address.isPrimary
+                        ?
+                        `<span class="primary-badge">
+                            PRIMARY
+                        </span>`
+                        :
+                        ""
+                    }
+
+                </div>
+
+                <div class="address-text">
+
+                    ${escapeHtml(
+                        address.addressLine1 || ""
+                    )}
+
+                    <br>
+
+                    ${
+                        address.addressLine2
+                            ?
+                            escapeHtml(
+                                address.addressLine2
+                            ) + "<br>"
+                            : ""
+                    }
+
+                    ${escapeHtml(
+                        address.city || ""
+                    )}
+
+                    ${
+                        address.state
+                            ?
+                            ", " +
+                            escapeHtml(
+                                address.state
+                            )
+                            : ""
+                    }
+
+                    ${
+                        address.postalCode
+                            ?
+                            " - " +
+                            escapeHtml(
+                                address.postalCode
+                            )
+                            : ""
+                    }
+
+                    <br>
+
+                    ${escapeHtml(
+                        address.country || ""
+                    )}
+
+                </div>
+
+                <div class="address-actions">
+
+                    ${
+                        address.primary ||
+                        address.isPrimary
+                        ? ""
+                        :
+                        `<button
+                            class="gold"
+                            onclick="setPrimary(${address.addressId})"
+                        >
+                            Set Primary
+                        </button>`
+                    }
+
+                    <button
+                        class="secondary"
+                        onclick='editAddress(${JSON.stringify(address)})'
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        class="danger"
+                        onclick="deleteAddress(${address.addressId})"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+async function saveAddress() {
+
+    try {
+
+        const customerId =
+            getCustomerId();
+
+        const addressId =
+            document.getElementById(
+                "addressId"
+            ).value;
+
+        const addressType =
+            document.getElementById(
+                "addressType"
+            ).value;
+
+        const addressLine1 =
+            document.getElementById(
+                "addressLine1"
+            ).value.trim();
+
+        const addressLine2 =
+            document.getElementById(
+                "addressLine2"
+            ).value.trim();
+
+        const city =
+            document.getElementById(
+                "city"
+            ).value.trim();
+
+        const state =
+            document.getElementById(
+                "state"
+            ).value.trim();
+
+        const country =
+            document.getElementById(
+                "country"
+            ).value.trim();
+
+        const postalCode =
+            document.getElementById(
+                "postalCode"
+            ).value.trim();
+
+        const isPrimary =
+            document.getElementById(
+                "isPrimary"
+            ).value === "true";
+
+        if (!addressType) {
+
+            throw new Error(
+                "Please select address type."
+            );
+        }
+
+        if (!addressLine1) {
+
+            throw new Error(
+                "Please enter address line 1."
+            );
+        }
+
+        if (!city) {
+
+            throw new Error(
+                "Please enter city."
+            );
+        }
+
+        if (!country) {
+
+            throw new Error(
+                "Please enter country."
+            );
+        }
+
+        const payload = {
+
+            addressType:
+                addressType,
+
+            addressLine1:
+                addressLine1,
+
+            addressLine2:
+                addressLine2 || null,
+
+            city:
+                city,
+
+            state:
+                state || null,
+
+            country:
+                country,
+
+            postalCode:
+                postalCode || null,
+
+            isPrimary:
+                isPrimary
+        };
+
+        if (addressId) {
+
+            await api(
+
+                "/" +
+                customerId +
+                "/addresses/" +
+                addressId,
+
+                {
+                    method: "PUT",
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+            showSuccess(
+                "Address updated successfully."
+            );
+
+        } else {
+
+            await api(
+
+                "/" +
+                customerId +
+                "/addresses",
+
+                {
+                    method: "POST",
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+            showSuccess(
+                "Address added successfully."
+            );
+        }
+
+        resetForm();
+
+        await loadAddresses();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(error.message);
+    }
+}
+
+function editAddress(address) {
+
+    document.getElementById(
+        "addressId"
+    ).value =
+        address.addressId || "";
+
+    document.getElementById(
+        "addressType"
+    ).value =
+        address.addressType || "";
+
+    document.getElementById(
+        "addressLine1"
+    ).value =
+        address.addressLine1 || "";
+
+    document.getElementById(
+        "addressLine2"
+    ).value =
+        address.addressLine2 || "";
+
+    document.getElementById(
+        "city"
+    ).value =
+        address.city || "";
+
+    document.getElementById(
+        "state"
+    ).value =
+        address.state || "";
+
+    document.getElementById(
+        "country"
+    ).value =
+        address.country || "";
+
+    document.getElementById(
+        "postalCode"
+    ).value =
+        address.postalCode || "";
+
+    document.getElementById(
+        "isPrimary"
+    ).value =
+        (
+            address.primary ||
+            address.isPrimary
+        )
+            ? "true"
+            : "false";
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Edit Address";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+function resetForm() {
+
+    document.getElementById(
+        "addressId"
+    ).value = "";
+
+    document.getElementById(
+        "addressType"
+    ).value = "";
+
+    document.getElementById(
+        "addressLine1"
+    ).value = "";
+
+    document.getElementById(
+        "addressLine2"
+    ).value = "";
+
+    document.getElementById(
+        "city"
+    ).value = "";
+
+    document.getElementById(
+        "state"
+    ).value = "";
+
+    document.getElementById(
+        "country"
+    ).value = "India";
+
+    document.getElementById(
+        "postalCode"
+    ).value = "";
+
+    document.getElementById(
+        "isPrimary"
+    ).value = "false";
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Add Address";
+}
+
+async function setPrimary(addressId) {
+
+    try {
+
+        const customerId =
+            getCustomerId();
+
+        await api(
+
+            "/" +
+            customerId +
+            "/addresses/" +
+            addressId +
+            "/set-primary",
+
+            {
+                method: "PATCH"
+            }
+        );
+
+        showSuccess(
+            "Primary address updated successfully."
+        );
+
+        await loadAddresses();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(error.message);
+    }
+}
+
+async function deleteAddress(addressId) {
+
+    if (
+        !confirm(
+            "Are you sure you want to delete this address?"
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const customerId =
+            getCustomerId();
+
+        await api(
+
+            "/" +
+            customerId +
+            "/addresses/" +
+            addressId,
+
+            {
+                method: "DELETE"
+            }
+        );
+
+        showSuccess(
+            "Address deleted successfully."
+        );
+
+        await loadAddresses();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(error.message);
+    }
+}
+
+function logout() {
+
+    localStorage.removeItem(
+        "customerToken"
+    );
+
+    localStorage.removeItem(
+        "customer"
+    );
+
+    localStorage.removeItem(
+        "isAuthenticated"
+    );
+
+    location.replace(
+        "../customerLoginReg.html"
+    );
+}
+
+loadAddresses();
+
+</script>
+
+</body>
+
+</html>

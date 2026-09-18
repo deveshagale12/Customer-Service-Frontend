@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Contacts</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7f6;
+            color: #17212b;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background: #062d2b;
+            color: white;
+            padding: 24px 16px;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            padding: 8px 12px 30px;
+        }
+
+        .brand span {
+            color: #d4af37;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav a {
+            padding: 13px 15px;
+            border-radius: 10px;
+            color: #d7e5e3;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #0d514c;
+            color: white;
+        }
+
+        .logout {
+            margin-top: 30px;
+            width: 100%;
+            border: 1px solid #52716d;
+            background: transparent;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e1e7e5;
+        }
+
+        .topbar h1 {
+            font-size: 25px;
+        }
+
+        .topbar p {
+            color: #71807c;
+            margin-top: 5px;
+        }
+
+        .content {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e9e7;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 22px;
+        }
+
+        .card h2 {
+            color: #063c38;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .field label {
+            display: block;
+            color: #667772;
+            font-size: 13px;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d5dfdc;
+            border-radius: 9px;
+            outline: none;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #087267;
+        }
+
+        button {
+            border: none;
+            border-radius: 9px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .primary {
+            background: #087267;
+            color: white;
+        }
+
+        .secondary {
+            background: #e8f1ef;
+            color: #075e54;
+        }
+
+        .danger {
+            background: #fff0ee;
+            color: #b42318;
+        }
+
+        .success {
+            background: #e8f6ed;
+            color: #146c36;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .contact-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .contact {
+            border: 1px solid #e0e7e5;
+            border-radius: 13px;
+            padding: 18px;
+        }
+
+        .contact-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .contact-type {
+            color: #063c38;
+            font-weight: 700;
+        }
+
+        .contact-value {
+            margin-top: 8px;
+            color: #344440;
+            word-break: break-word;
+        }
+
+        .verified {
+            background: #e8f6ed;
+            color: #146c36;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .not-verified {
+            background: #fff7df;
+            color: #856404;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .message {
+            padding: 13px;
+            border-radius: 9px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .success-message {
+            background: #e9f8ef;
+            color: #146c36;
+        }
+
+        .error-message {
+            background: #fff0ee;
+            color: #b42318;
+        }
+
+        @media(max-width: 700px) {
+
+            .sidebar {
+                top: auto;
+                width: 100%;
+                height: auto;
+                bottom: 0;
+                padding: 7px;
+                z-index: 100;
+            }
+
+            .brand,
+            .logout {
+                display: none;
+            }
+
+            .nav {
+                flex-direction: row;
+                gap: 2px;
+            }
+
+            .nav a {
+                flex: 1;
+                text-align: center;
+                font-size: 11px;
+                padding: 10px 4px;
+            }
+
+            .main {
+                margin-left: 0;
+                padding-bottom: 70px;
+            }
+
+            .topbar {
+                padding: 18px;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-top {
+                flex-direction: column;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="brand">
+        Fin<span>ova</span>
+    </div>
+
+    <nav class="nav">
+        <a href="CustomerDashboard.html">⌂ Dashboard</a>
+        <a href="CustomerProfile.html">♙ Profile</a>
+        <a class="active" href="CustomerContacts.html">☎ Contacts</a>
+        <a href="CustomerAddresses.html">⌖ Addresses</a>
+    </nav>
+
+    <button class="logout" onclick="logout()">Logout</button>
+
+</aside>
+
+<main class="main">
+
+    <header class="topbar">
+
+        <h1>Customer Contacts</h1>
+
+        <p>
+            Manage your contact information
+        </p>
+
+    </header>
+
+    <div class="content">
+
+        <div id="successMessage" class="message success-message"></div>
+
+        <div id="errorMessage" class="message error-message"></div>
+
+        <section class="card">
+
+            <h2 id="formTitle">
+                Add Contact
+            </h2>
+
+            <input type="hidden" id="contactId">
+
+            <div class="form-grid">
+
+                <div class="field">
+
+                    <label>
+                        Contact Type
+                    </label>
+
+                    <select id="contactType">
+
+                        <option value="">
+                            Select Contact Type
+                        </option>
+
+                        <option value="EMAIL">
+                            Email
+                        </option>
+
+                        <option value="MOBILE">
+                            Mobile
+                        </option>
+
+                        <option value="PHONE">
+                            Phone
+                        </option>
+
+                        <option value="ALTERNATE">
+                            Alternate
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Contact Value
+                    </label>
+
+                    <input
+                        id="contactValue"
+                        placeholder="Enter contact value"
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    class="primary"
+                    onclick="saveContact()"
+                >
+                    Save Contact
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="resetForm()"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="card">
+
+            <h2>
+                Your Contacts
+            </h2>
+
+            <div id="contactList" class="contact-list">
+
+                Loading contacts...
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<script>
+
+const BASE_URL = "https://customerservice-mmah.onrender.com";
+
+const API_BASE =
+    BASE_URL + "/api/v1/customers";
+
+const API_KEY =
+    "my-secret-api-key-12345";
+
+const token =
+    localStorage.getItem("customerToken");
+
+const authenticated =
+    localStorage.getItem("isAuthenticated") === "true";
+
+if (!token || !authenticated) {
+    location.replace("../customerLoginReg.html");
+}
+
+function requestHeaders(body = false) {
+
+    const headers = {
+
+        "Authorization":
+            "Bearer " +
+            localStorage.getItem("customerToken"),
+
+        "X-API-KEY":
+            API_KEY
+    };
+
+    if (body) {
+        headers["Content-Type"] =
+            "application/json";
+    }
+
+    return headers;
+}
+
+async function api(path, options = {}) {
+
+    const response = await fetch(
+        API_BASE + path,
+        {
+            ...options,
+
+            headers: {
+                ...requestHeaders(
+                    options.body !== undefined
+                ),
+
+                ...(options.headers || {})
+            }
+        }
+    );
+
+    const text =
+        await response.text();
+
+    let data;
+
+    try {
+        data =
+            text ? JSON.parse(text) : null;
+    } catch {
+        data = text;
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data?.message ||
+            data?.error ||
+            `Request failed (${response.status})`
+        );
+    }
+
+    return data;
+}
+
+function getCustomerId() {
+
+    try {
+
+        const customer =
+            JSON.parse(
+                localStorage.getItem("customer") ||
+                "null"
+            );
+
+        return customer?.customerId;
+
+    } catch {
+
+        return null;
+    }
+}
+
+function showSuccess(message) {
+
+    const el =
+        document.getElementById(
+            "successMessage"
+        );
+
+    el.textContent = message;
+    el.style.display = "block";
+
+    document.getElementById(
+        "errorMessage"
+    ).style.display = "none";
+}
+
+function showError(message) {
+
+    const el =
+        document.getElementById(
+            "errorMessage"
+        );
+
+    el.textContent = message;
+    el.style.display = "block";
+
+    document.getElementById(
+        "successMessage"
+    ).style.display = "none";
+}
+
+async function loadContacts() {
+
+    try {
+
+        const customerId =
+            getCustomerId();
+
+        if (!customerId) {
+            throw new Error(
+                "Customer ID not found."
+            );
+        }
+
+        const contacts =
+            await api(
+                "/" +
+                customerId +
+                "/contacts"
+            );
+
+        renderContacts(
+            Array.isArray(contacts)
+                ? contacts
+                : []
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(error.message);
+
+        document.getElementById(
+            "contactList"
+        ).innerHTML =
+            "<p>Unable to load contacts.</p>";
+    }
+}
+
+function renderContacts(contacts) {
+
+    const list =
+        document.getElementById(
+            "contactList"
+        );
+
+    if (!contacts.length) {
+
+        list.innerHTML =
+            "<p>No contacts found.</p>";
+
+        return;
+    }
+
+    list.innerHTML =
+        contacts.map(contact => `
+
+            <div class="contact">
+
+                <div class="contact-top">
+
+                    <div>
+
+                        <div class="contact-type">
+                            ${escapeHtml(
+                                contact.contactType || "-"
+                            )}
+                        </div>
+
+                        <div class="contact-value">
+                            ${escapeHtml(
+                                contact.contactValue || "-"
+                            )}
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        ${
+                            contact.verified ||
+                            contact.isVerified
+                            ?
+                            `<span class="verified">
+                                Verified
+                            </span>`
+                            :
+                            `<span class="not-verified">
+                                Not Verified
+                            </span>`
+                        }
+
+                    </div>
+
+                </div>
+
+                <div class="contact-actions">
+
+                    ${
+                        contact.verified ||
+                        contact.isVerified
+                        ? ""
+                        :
+                        `<button
+                            class="success"
+                            onclick="verifyContact(${contact.contactId})"
+                        >
+                            Verify
+                        </button>`
+                    }
+
+                    <button
+                        class="secondary"
+                        onclick='editContact(${JSON.stringify(contact)})'
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        class="danger"
+                        onclick="deleteContact(${contact.contactId})"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+async function saveContact() {
+
+    try {
+
+        const customerId =
+            getCustomerId();
+
+        const contactId =
+            document.getElementById(
+                "contactId"
+            ).value;
+
+        const contactType =
+            document.getElementById(
+                "contactType"
+            ).value;
+
+        const contactValue =
+            document.getElementById(
+                "contactValue"
+            ).value.trim();
+
+        if (!contactType) {
+
+            throw new Error(
+                "Please select contact type."
+            );
+        }
+
+        if (!contactValue) {
+
+            throw new Error(
+                "Please enter contact value."
+            );
+        }
+
+        const payload = {
+
+            contactType:
+                contactType,
+
+            contactValue:
+                contactValue,
+
+            isVerified:
+                false
+        };
+
+        if (contactId) {
+
+            await api(
+                "/" +
+                customerId +
+                "/contacts/" +
+                contactId,
+                {
+                    method: "PUT",
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            showSuccess(
+                "Contact updated successfully."
+            );
+
+        } else {
+
+            await api(
+                "/" +
+                customerId +
+                "/contacts",
+                {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            showSuccess(
+                "Contact added successfully."
+            );
+        }
+
+        resetForm();
+
+        await loadContacts();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(error.message);
+    }
+}
+
+function editContact(contact) {
+
+    document.getElementById(
+        "contactId"
+    ).value =
+        contact.contactId || "";
+
+    document.getElementById(
+        "contactType"
+    ).value =
+        contact.contactType || "";
+
+    document.getElementById(
+        "contactValue"
+    ).value =
+        contact.contactValue || "";
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Edit Contact";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+function resetForm() {
+
+    document.getElementById(
+        "contactId"
+    ).value = "";
+
+    document.getElementById(
+        "contactType"
+    ).value = "";
+
+    document.getElementById(
+        "contactValue"
+    ).value = "";
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Add Contact";
+}
+
+async function verifyContact(contactId) {
+
+    try {
+
+        const customerId =
+            getCustomerId();
+
+        await api(
+            "/" +
+            customerId +
+            "/contacts/" +
+            contactId +
+            "/verify",
+            {
+                method: "PATCH"
+            }
+        );
+
+        showSuccess(
+            "Contact verified successfully."
+        );
+
+        await loadContacts();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(error.message);
+    }
+}
+
+async function deleteContact(contactId) {
+
+    if (
+        !confirm(
+            "Are you sure you want to delete this contact?"
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const customerId =
+            getCustomerId();
+
+        await api(
+            "/" +
+            customerId +
+            "/contacts/" +
+            contactId,
+            {
+                method: "DELETE"
+            }
+        );
+
+        showSuccess(
+            "Contact deleted successfully."
+        );
+
+        await loadContacts();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(error.message);
+    }
+}
+
+function logout() {
+
+    localStorage.removeItem(
+        "customerToken"
+    );
+
+    localStorage.removeItem(
+        "customer"
+    );
+
+    localStorage.removeItem(
+        "isAuthenticated"
+    );
+
+    location.replace(
+        "../customerLoginReg.html"
+    );
+}
+
+loadContacts();
+
+</script>
+
+</body>
+</html>
